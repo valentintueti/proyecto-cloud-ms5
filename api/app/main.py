@@ -6,6 +6,7 @@ las expone como JSON. Documentacion interactiva en /docs (swagger-ui).
 """
 import logging
 
+from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -44,6 +45,15 @@ def _run(name):
     except AthenaQueryError as exc:
         logger.exception("Fallo la consulta Athena '%s'", name)
         raise HTTPException(status_code=502, detail=str(exc)) from exc
+    except (ClientError, BotoCoreError) as exc:
+        # Credenciales expiradas/invalidas, bucket sin permisos, etc. Se
+        # expone el mensaje real (no es produccion) para poder depurar sin
+        # tener que ir a buscar los logs del contenedor cada vez.
+        logger.exception("Error de AWS/boto3 en la consulta '%s'", name)
+        raise HTTPException(status_code=502, detail=f"Error de AWS: {exc}") from exc
+    except Exception as exc:  # noqa: BLE001 - ultimo recurso, nunca 500 opaco
+        logger.exception("Error inesperado en la consulta '%s'", name)
+        raise HTTPException(status_code=500, detail=f"Error inesperado: {exc}") from exc
 
 
 @app.get("/analitica/demanda-por-ruta", summary="Consulta 1: demanda por ruta")
