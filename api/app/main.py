@@ -5,6 +5,7 @@ ejecuta consultas Athena (sobre el catalogo Glue poblado por ingesta/) y
 las expone como JSON. Documentacion interactiva en /docs (swagger-ui).
 """
 import logging
+import os
 
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import FastAPI, HTTPException
@@ -24,6 +25,7 @@ app = FastAPI(
         "como JSON para el frontend."
     ),
     version="1.0.0",
+    root_path=os.getenv("ROOT_PATH", "")
 )
 
 app.add_middleware(
