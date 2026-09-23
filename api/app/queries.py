@@ -3,7 +3,7 @@ avance_consultas/ms5_consultas_athena_vistas.md). No se reescribe nada aqui:
 cada entrada es copia textual de una consulta/vista ya probada, para que la
 API nunca diverja silenciosamente del SQL documentado."""
 
-DB = "transporte_metropolitano"
+DB = "transporte"
 
 QUERIES = {
     "demanda_por_ruta": f"""
