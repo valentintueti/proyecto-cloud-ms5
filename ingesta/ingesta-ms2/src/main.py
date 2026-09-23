@@ -12,7 +12,7 @@ def run():
         print(f"Extrayendo {nombre} de MS2 (MongoDB)...")
         data = extractor()
         print(f"{len(data)} documentos extraídos.")
-        subir_a_s3(data, settings.S3_BUCKET, prefix=f"ms2_{nombre}")
+        subir_a_s3(data, settings.S3_BUCKET, prefix=nombre)
 
     print("Listo.")
 
