@@ -1,40 +1,18 @@
-name: ms5-ingesta
-
-x-job: &job
-  restart: "no"
-  environment:
-    OUTPUT_DIR: /reports
-    AWS_EC2_METADATA_DISABLED: "true"
-    INGESTION_RUN_ID: ${INGESTION_RUN_ID:-}
-  volumes:
-    - ./reports:/reports
-  extra_hosts:
-    - "host.docker.internal:host-gateway"
-
 services:
   ingesta-ms1:
-    <<: *job
-    build:
-      context: .
-      dockerfile: ingesta-ms1/Dockerfile
+    build: ./ingesta-ms1
     env_file:
-      - ./aws.env
-      - ./ms1.env
+      - ./ingesta-ms1/.env
+    restart: "no"
 
   ingesta-ms2:
-    <<: *job
-    build:
-      context: .
-      dockerfile: ingesta-ms2/Dockerfile
+    build: ./ingesta-ms2
     env_file:
-      - ./aws.env
-      - ./ms2.env
+      - ./ingesta-ms2/.env
+    restart: "no"
 
   ingesta-ms3:
-    <<: *job
-    build:
-      context: .
-      dockerfile: ingesta-ms3/Dockerfile
+    build: ./ingesta-ms3
     env_file:
-      - ./aws.env
-      - ./ms3.env
+      - ./ingesta-ms3/.env
+    restart: "no"

@@ -25,7 +25,7 @@ app = FastAPI(
         "como JSON para el frontend."
     ),
     version="1.0.0",
-    root_path=os.getenv("ROOT_PATH", "")
+    root_path=os.getenv("ROOT_PATH", ""),
 )
 
 app.add_middleware(
@@ -48,9 +48,6 @@ def _run(name):
         logger.exception("Fallo la consulta Athena '%s'", name)
         raise HTTPException(status_code=502, detail=str(exc)) from exc
     except (ClientError, BotoCoreError) as exc:
-        # Credenciales expiradas/invalidas, bucket sin permisos, etc. Se
-        # expone el mensaje real (no es produccion) para poder depurar sin
-        # tener que ir a buscar los logs del contenedor cada vez.
         logger.exception("Error de AWS/boto3 en la consulta '%s'", name)
         raise HTTPException(status_code=502, detail=f"Error de AWS: {exc}") from exc
     except Exception as exc:  # noqa: BLE001 - ultimo recurso, nunca 500 opaco
@@ -98,6 +95,6 @@ def viajes_fuera_horario():
     return _run("viajes_fuera_horario")
 
 
-@app.get("/analitica/ingresos-por-ruta", summary="Vista: ingresos por ruta y mes")
-def ingresos_por_ruta():
-    return _run("ingresos_por_ruta")
+@app.get("/analitica/trasbordos-por-ruta-destino", summary="Consulta 9: rutas que más reciben trasbordos")
+def trasbordos_por_ruta_destino():
+    return _run("trasbordos_por_ruta_destino")

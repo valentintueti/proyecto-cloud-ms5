@@ -1,8 +1,21 @@
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from common import main
-from extractor import extraer_servicios
+from extractor import extraer_rutas, extraer_paraderos, extraer_servicios
+from uploader import subir_a_s3
+from config import settings
+
+
+def run():
+    for nombre, extractor in [
+        ("rutas", extraer_rutas),
+        ("paraderos", extraer_paraderos),
+        ("servicios", extraer_servicios),
+    ]:
+        print(f"Extrayendo {nombre} de MS2 (MongoDB)...")
+        data = extractor()
+        print(f"{len(data)} documentos extraídos.")
+        subir_a_s3(data, settings.S3_BUCKET, prefix=f"ms2_{nombre}")
+
+    print("Listo.")
+
 
 if __name__ == "__main__":
-    raise SystemExit(main("ms2", extraer_servicios))
+    run()

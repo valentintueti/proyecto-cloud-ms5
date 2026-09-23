@@ -1,9 +1,21 @@
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from common import main
-from extractor import extraer_pasajeros_y_tarjetas
+from extractor import extraer_pasajeros, extraer_tarjetas
+from uploader import subir_a_s3
+from config import settings
+
+
+def run():
+    print("Extrayendo pasajeros de MS1 (PostgreSQL)...")
+    df_pasajeros = extraer_pasajeros()
+    print(f"{len(df_pasajeros)} pasajeros extraídos.")
+    subir_a_s3(df_pasajeros, settings.S3_BUCKET, prefix="ms1_pasajeros")
+
+    print("Extrayendo tarjetas de MS1 (PostgreSQL)...")
+    df_tarjetas = extraer_tarjetas()
+    print(f"{len(df_tarjetas)} tarjetas extraídas.")
+    subir_a_s3(df_tarjetas, settings.S3_BUCKET, prefix="ms1_tarjetas")
+
+    print("Listo.")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main("ms1", extraer_pasajeros_y_tarjetas))
+    run()

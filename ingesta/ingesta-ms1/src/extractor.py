@@ -1,30 +1,30 @@
-from contextlib import closing
-from common import database_config, write_csv
+import psycopg2
+import pandas as pd
+from config import settings
 
 
-def extraer_pasajeros_y_tarjetas(directory, warnings):
-    import psycopg2
-    config = database_config()
-    # Both tables come from the same read-only snapshot. No JOIN drops passengers
-    # without cards or duplicates passenger records for people with multiple cards.
-    with closing(psycopg2.connect(**config, connect_timeout=10, client_encoding="UTF8")) as connection:
-        connection.set_session(readonly=True, isolation_level="REPEATABLE READ")
-        exports = []
-        for table, dataset in (("pasajero", "pasajeros"), ("tarjeta", "tarjetas")):
-            with connection.cursor(name=f"export_{table}") as cursor:
-                cursor.itersize = 2000
-                cursor.execute(f'SELECT * FROM "{table}"')
-                first = cursor.fetchmany(2000)
-                columns = [item.name for item in cursor.description]
+def _conectar():
+    return psycopg2.connect(
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+        dbname=settings.DB_NAME,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD
+    )
 
-                def rows():
-                    yield from first
-                    while True:
-                        batch = cursor.fetchmany(2000)
-                        if not batch:
-                            break
-                        yield from batch
 
-                exports.append(write_csv(directory, dataset, columns, rows()))
-        connection.rollback()
-        return exports
+def extraer_pasajeros() -> pd.DataFrame:
+    conn = _conectar()
+    df = pd.read_sql("SELECT id, nombre, fecha_nacimiento, sexo, distrito FROM pasajero", conn)
+    conn.close()
+    return df
+
+
+def extraer_tarjetas() -> pd.DataFrame:
+    conn = _conectar()
+    df = pd.read_sql(
+        "SELECT id, pasajero_id, fecha_emision, fecha_vencimiento, tipo, saldo FROM tarjeta",
+        conn
+    )
+    conn.close()
+    return df

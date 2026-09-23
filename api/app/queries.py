@@ -101,9 +101,10 @@ QUERIES = {
             + CAST(split_part(s.hora_fin, ':', 2) AS INTEGER)
           )
     """,
-    "ingresos_por_ruta": f"""
-        SELECT ruta_nombre, mes, ingreso_total, total_pagos
-        FROM {DB}.vista_ingresos_por_ruta
-        ORDER BY mes, ruta_nombre
+    "trasbordos_por_ruta_destino": f"""
+        SELECT ruta_destino, COUNT(*) AS total_conexiones
+        FROM {DB}.vista_conexiones_completas
+        GROUP BY ruta_destino
+        ORDER BY total_conexiones DESC
     """,
 }
