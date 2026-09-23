@@ -7,28 +7,27 @@ def _conectar():
     return client, client[settings.DB_NAME]
 
 
+def _renombrar_id(doc: dict) -> dict:
+    doc["id"] = str(doc.pop("_id"))
+    return doc
+
+
 def extraer_rutas() -> list[dict]:
     client, db = _conectar()
-    docs = list(db.rutas.find({}))
+    docs = [_renombrar_id(d) for d in db.rutas.find({})]
     client.close()
-    for d in docs:
-        d["_id"] = str(d["_id"])
     return docs
 
 
 def extraer_paraderos() -> list[dict]:
     client, db = _conectar()
-    docs = list(db.paraderos.find({}))
+    docs = [_renombrar_id(d) for d in db.paraderos.find({})]
     client.close()
-    for d in docs:
-        d["_id"] = str(d["_id"])
     return docs
 
 
 def extraer_servicios() -> list[dict]:
     client, db = _conectar()
-    docs = list(db.servicios.find({}))
+    docs = [_renombrar_id(d) for d in db.servicios.find({})]
     client.close()
-    for d in docs:
-        d["_id"] = str(d["_id"])
     return docs
