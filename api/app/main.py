@@ -20,9 +20,9 @@ logger = logging.getLogger("ms5-api")
 app = FastAPI(
     title="MS5 - API Rest Consultas Analiticas",
     description=(
-        "Ejecuta consultas Athena sobre los datos ingeridos de MS1/MS2/MS3 "
-        "(via el catalogo Glue en el bucket S3 de la ingesta) y las expone "
-        "como JSON para el frontend."
+        "Ejecuta 4 consultas Athena sobre 2 vistas (vista_viajes_completos y "
+        "vista_conexiones_completas) construidas con JOIN sobre los datos "
+        "ingeridos de MS1/MS2/MS3."
     ),
     version="1.0.0",
     root_path=os.getenv("ROOT_PATH", ""),
@@ -70,31 +70,6 @@ def demanda_por_hora():
     return _run("demanda_por_hora")
 
 
-@app.get("/analitica/evolucion-mensual", summary="Consulta 4: evolucion mensual de la demanda")
-def evolucion_mensual():
-    return _run("evolucion_mensual")
-
-
-@app.get("/analitica/paraderos-por-perfil", summary="Consulta 5: paraderos mas visitados por edad/distrito")
-def paraderos_por_perfil():
-    return _run("paraderos_por_perfil")
-
-
-@app.get("/analitica/concentracion-pasajeros", summary="Consulta 6: concentracion de pasajeros (Pareto)")
-def concentracion_pasajeros():
-    return _run("concentracion_pasajeros")
-
-
-@app.get("/analitica/saldo-flotante", summary="Consulta 7: saldo flotante total en tarjetas")
-def saldo_flotante():
-    return _run("saldo_flotante")
-
-
-@app.get("/analitica/viajes-fuera-horario", summary="Consulta 8: viajes fuera del horario declarado")
-def viajes_fuera_horario():
-    return _run("viajes_fuera_horario")
-
-
-@app.get("/analitica/trasbordos-por-ruta-destino", summary="Consulta 9: rutas que más reciben trasbordos")
+@app.get("/analitica/trasbordos-por-ruta-destino", summary="Consulta 4: rutas que más reciben trasbordos")
 def trasbordos_por_ruta_destino():
     return _run("trasbordos_por_ruta_destino")
